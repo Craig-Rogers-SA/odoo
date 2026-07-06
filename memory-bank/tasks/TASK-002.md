@@ -5,6 +5,7 @@
 **Reflection**: memory-bank/reflection/reflection-TASK-002.md
 **Archived**: memory-bank/archive/archive-TASK-002.md
 **Completed**: 2026-07-06
+**PR URL**: https://github.com/Craig-Rogers-SA/odoo/pull/1
 **Roadmap**: N/A
 **Branch**: task/002-characterization-tests-credit-warning
 **Worktree**: N/A (Level 1 uses direct branch, not worktree)
