@@ -1,0 +1,65 @@
+C4-CODE AGENT RUN SUMMARY
+Run ID: banyan-c4-20260701-init
+Generated: 2026-07-01T00:00:00Z
+Plugin: 1.8.0
+
+RESULTS:
+========
+
+Directory 1: addons/website
+  Slug: addons-website
+  Status: COMPLETE
+  Output: C:\Users\crogers\odoo\memory-bank\c4\code\c4-code-addons-website.md
+  Files: 87 Python files
+  Code Elements:
+    - Classes: 8 (Website, WebsitePage, WebsiteMenu, WebsiteVisitor, WebsiteForm, WebsiteRewrite, WebsiteSnippetFilter, MockRequest)
+    - Functions: 6 (uninstall_hook, post_init_hook, website_domain, _compute_domain_punycode, _compute_blocked_third_party_domains, others)
+    - Constants: 4 (DEFAULT_CDN_FILTERS, DEFAULT_WEBSITE_ENDPOINT, DEFAULT_OLG_ENDPOINT, DEFAULT_BLOCKED_THIRD_PARTY_DOMAINS)
+  External Dependencies: 7 (geoip2, lxml, werkzeug, requests, psycopg2, pytz, base64)
+  Internal Dependencies: 11 modules (web, web_editor, html_editor, http_routing, portal, social_media, auth_signup, mail, google_recaptcha, utm, digest, base)
+
+Directory 2: addons/point_of_sale
+  Slug: addons-point_of_sale
+  Status: COMPLETE
+  Output: C:\Users\crogers\odoo\memory-bank\c4\code\c4-code-addons-point_of_sale.md
+  Files: 75 Python files
+  Code Elements:
+    - Classes: 8 (PosOrder, PosSession, PosConfig, PosOrderLine, PosPayment, PosPaymentMethod, PosPrinter, PosCategory, ProductCombo, ProductComboItem)
+    - Functions: 7 (_get_valid_session, _process_order, _compute_tracking_number, _prepare_combo_line_uuids, _link_combo_items, _process_saved_order, uninstall_hook)
+    - Constants: 3 (_name, _order, _mailing_enabled)
+  External Dependencies: 7 (psycopg2, pytz, markupsafe, json, uuid, itertools, logging)
+  Internal Dependencies: 12 modules (stock_account, barcodes, web_editor, digest, phone_validation, mail, account, stock, base)
+
+Directory 3: addons/hr_payroll
+  Slug: addons-hr_payroll
+  Status: SKIPPED - DIRECTORY NOT FOUND
+  Note: C:\Users\crogers\odoo\addons\hr_payroll does not exist in this repository
+
+AGGREGATE STATS:
+================
+Directories Processed: 2 complete, 1 skipped (not found)
+Total Files Documented: 162 Python files
+Total Classes: 16
+Total Functions: 13
+Total Constants: 7
+Total Internal Dependencies: 23 module connections
+Total External Dependencies: 14 unique packages
+
+SYNTHESIS HINTS:
+================
+website addon:
+  - Belongs with website_sale, website_blog, website_forum, website_calendar (multi-website extensions)
+  - Boundary code: HTTP controllers + ORM models + QWeb templates
+  - Multi-tenancy: website_id filter throughout all models
+
+point_of_sale addon:
+  - Belongs with pos_iot, pos_restaurant, pos_iot_pay_terminal, inventory/sales
+  - State machine: PosSession (open→close), PosOrder (draft→paid→invoiced)
+  - Offline-capable: UUID-based deduplication, pos.load.mixin for sync
+  - Boundary: Controllers (HTTP) + OWL frontend (JavaScript) + payment terminals
+
+NEXT STEPS:
+===========
+1. Run /banyan-c4 --refresh-from component to synthesize logical components
+2. Run /banyan-c4 --refresh-from container to map to deployment units
+3. Run /banyan-c4 --refresh-from context to distill system context with personas
