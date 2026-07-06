@@ -13,22 +13,47 @@ If a test fails after a refactor:
   3. Commit both the implementation change and the test update together.
 
 Do NOT convert these to assertIn / assertRegex — full-string equality is the point.
+
+ISOLATION NOTE
+──────────────
+This file uses TransactionCase directly and sets up all fixtures inline.
+banyan_* addons must not import from other addons' Python modules.
 """
 
 from odoo.fields import Command
-from odoo.tests import tagged
-
-from odoo.addons.sale.tests.common import TestSaleCommon
+from odoo.tests import TransactionCase, tagged
 
 
 @tagged('post_install', '-at_install')
-class TestCharacterizeCreditWarning(TestSaleCommon):
+class TestCharacterizeCreditWarning(TransactionCase):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.env.company.account_use_credit_limit = True
-        cls.partner_a.credit_limit = 100.0
+
+        cls.partner_a = cls.env['res.partner'].create({
+            'name': 'partner_a',
+            'company_type': 'company',
+            'credit_limit': 100.0,
+        })
+
+        uom = cls.env.ref('uom.product_uom_unit')
+        cls.product = cls.env['product.product'].create({
+            'name': 'Test Product',
+            'type': 'service',
+            'invoice_policy': 'order',
+            'list_price': 0.0,
+            'uom_id': uom.id,
+            'uom_po_id': uom.id,
+            'taxes_id': [Command.clear()],
+        })
+
+        cls.income_account = cls.env['account.account'].search([
+            ('account_type', '=', 'income'),
+            ('deprecated', '=', False),
+            ('company_id', '=', cls.env.company.id),
+        ], limit=1)
 
     def setUp(self):
         super().setUp()
@@ -45,7 +70,7 @@ class TestCharacterizeCreditWarning(TestSaleCommon):
         lines = []
         if amount:
             lines = [Command.create({
-                'product_id': self.company_data['product_order_no'].id,
+                'product_id': self.product.id,
                 'price_unit': amount,
                 'product_uom_qty': 1,
                 'tax_id': False,
@@ -69,7 +94,7 @@ class TestCharacterizeCreditWarning(TestSaleCommon):
             'partner_id': self.partner_a.id,
             'invoice_line_ids': [Command.create({
                 'name': 'characterization setup',
-                'account_id': self.company_data['default_account_revenue'].id,
+                'account_id': self.income_account.id,
                 'quantity': 1,
                 'price_unit': amount,
                 'tax_ids': False,
